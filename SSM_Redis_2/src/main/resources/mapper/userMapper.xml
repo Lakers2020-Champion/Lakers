@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace用来定位具体是哪一个mapper文件的东西，不能与其它mapper的namespace重复  -->
+<mapper namespace="com.zhiyou.dao.UserDao">
+	<insert id="add" parameterType="user">
+		insert into user values(#{id},#{name},#{password},#{money},#{date})
+	</insert>
+	<delete id="delete" parameterType="int">
+		delete from user where id=#{id};
+	</delete>	
+	<update id="update" parameterType="user">
+		update user 
+				<trim prefix="set" suffixOverrides=",">
+					<if test="name!=null">
+						username=#{name},
+					</if>
+					<if test="password!=null">
+						password=#{password},
+					</if>
+					<if test="money!=null">
+						money=#{money},
+					</if>
+					<if test="date!=null">
+						date=#{date}
+					</if>
+				</trim>  		
+			where id=#{id}
+	</update> 
+	<resultMap type="user" id="userMap">
+		<id column="id" property="id"/>
+		<result column="username" property="name" />
+		<result column="password" property="password" />
+		<result column="money" property="money" />
+		<result column="date" property="date" />
+	</resultMap>	
+	<select id="selectAll" resultMap="userMap">
+		select * from user
+	</select>	
+	<select id="select" resultMap="userMap" flushCache="true">
+		<!-- 引入被抽离出来的sql语句 -->
+		<include refid="aaa" />
+	</select>
+	<!-- 将需要重复的sql语句抽离出来 -->
+	<sql id="aaa">
+		select * from user	
+		<trim prefix="where" prefixOverrides="and|or">
+			<if test="id!=null">
+				id=#{id}
+			</if>
+			<if test="name!=null">
+				and username=#{name}
+			</if>
+			<if test="password!=null">
+				and password=#{password}
+			</if>
+			<if test="money!=null">
+				and money=#{money}
+			</if>
+			<if test="date!=null">
+				and date=#{date}
+			</if>
+		</trim>
+	</sql>
+	<select id="selectById" resultMap="userMap">
+		select * from user where id=#{id}
+	</select>
+</mapper>
